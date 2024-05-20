@@ -54,8 +54,8 @@ const SignIn = () => {
             App
           </Link>
           <p className="text-sm mt-5">
-            This is a demo project. You can sign in with your email and password
-            or with Google.
+            This is a blog app where you can share your thoughts and ideas with
+            the world. Sign in now to start sharing. 🚀
           </p>
         </div>
 
