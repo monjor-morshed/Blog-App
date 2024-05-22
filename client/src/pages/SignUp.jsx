@@ -11,10 +11,35 @@ const SignUp = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
+  const validateInput = () => {
+    const { username, email, password } = formData;
+
+    if (!username || !email || !password) {
+      return "Please fill all the fields.";
+    }
+    if (username.length < 7 || username.length > 20) {
+      return "Username must be between 7 and 20 characters.";
+    }
+    if (username.includes(" ")) {
+      return "Username cannot contain spaces.";
+    }
+    if (username !== username.toLowerCase()) {
+      return "Username must be lowercase.";
+    }
+    if (!username.match(/^[a-z0-9]+$/)) {
+      return "Username must be alphanumeric.";
+    }
+    if (password.length < 6) {
+      return "Password must be at least 6 characters.";
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.email || !formData.password) {
-      return setErrorMessage("Please fill all the fields.");
+    const error = validateInput();
+    if (error) {
+      return setErrorMessage(error);
     }
     try {
       setLoading(true);
@@ -107,12 +132,12 @@ const SignUp = () => {
               Sign In
             </Link>
           </div>
-        </div>{" "}
-        {errorMessage && (
-          <Alert className="mt-5" color="failure">
-            {errorMessage}
-          </Alert>
-        )}
+          {errorMessage && (
+            <Alert className="mt-5" color="failure">
+              {errorMessage}
+            </Alert>
+          )}
+        </div>
       </div>
     </div>
   );
