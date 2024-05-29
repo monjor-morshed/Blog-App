@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
       default:
         "https://www.strasys.uk/wp-content/uploads/2022/02/Depositphotos_484354208_S.jpg",
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

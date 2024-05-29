@@ -1,12 +1,13 @@
 // import React from 'react'
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { Footer, FooterCopyright } from "flowbite-react";
 import { BsFacebook, BsLinkedin, BsGithub } from "react-icons/bs";
 const FooterCompo = () => {
   return (
-    <Footer container className="border border-t-8 border-teal-500">
+    <Footer container>
+      {/* className="border border-t-8 border-teal-500" */}
       <div className="w-full max-w-7xl mx-auto">
-        <div className="grid w-full justify-between sm:flex md:grid-cols-1">
+        {/* <div className="grid w-full justify-between sm:flex md:grid-cols-1">
           <div className="mt-5">
             <Link
               to="/"
@@ -70,14 +71,15 @@ const FooterCompo = () => {
               </Footer.LinkGroup>
             </div>
           </div>
-        </div>
-        <Footer.Divider />
+        </div> */}
+        {/* <Footer.Divider /> */}
         <div className="w-full sm:flex sm:items-center sm:justify-between">
           <FooterCopyright
             href="#"
-            by="Blog-App"
+            by="Blog-App. All rights reserved."
             year={new Date().getFullYear()}
           />
+
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
             <Footer.Icon href="#" icon={BsFacebook} />
             <Footer.Icon href="#" icon={BsGithub} />
