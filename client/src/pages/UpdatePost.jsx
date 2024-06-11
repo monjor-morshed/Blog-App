@@ -11,17 +11,41 @@ import {
 import app from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const CreatePost = () => {
+const UpdatePost = () => {
   const [imageFile, setImageFile] = useState(null);
 
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [formData, setFormData] = useState({});
   const [publishError, setPublishError] = useState(null);
+  const { postId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    try {
+      const fetchPost = async () => {
+        const res = await fetch(`/api/post/getposts?postId=${postId}`);
+        const data = await res.json();
+        if (!res.ok) {
+          console.log(data.message);
+          setPublishError(data.message);
+          return;
+        }
+        if (res.ok) {
+          setPublishError(null);
+          setFormData(data.posts[0]);
+        }
+      };
+      fetchPost();
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, [postId]);
 
   const handleUploadImage = async () => {
     try {
@@ -55,19 +79,21 @@ const CreatePost = () => {
     } catch (error) {
       setImageFileUploadError("Could not upload image");
       setImageFileUploadProgress(null);
-      // console.log(error);
     }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/post/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `/api/post/updatepost/${formData._id}/${currentUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await res.json();
       if (!res.ok) {
         setPublishError(data.message);
@@ -80,12 +106,11 @@ const CreatePost = () => {
       }
     } catch (error) {
       setPublishError("Something went wrong!");
-      // console.log(error);
     }
   };
   return (
     <div className="p-2 max-w-3xl mx-auto min-h-screen">
-      <h1 className="text-center text-3xl my-7 font-semibold">Create A Post</h1>
+      <h1 className="text-center text-3xl my-7 font-semibold">Update Post</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
@@ -97,20 +122,21 @@ const CreatePost = () => {
             onChange={(e) => {
               setFormData({ ...formData, title: e.target.value });
             }}
+            value={formData.title}
           />
           <Select
             onChange={(e) => {
               setFormData({ ...formData, category: e.target.value });
             }}
+            value={formData.category}
           >
             <option value="uncategorized">Select A Category</option>
             <option value="technology">Technology</option>
             <option value="lifestyle">Lifestyle</option>
-            {/* <option value="health">Health</option> */}
+
             <option value="travel">Travel</option>
             <option value="food">Food</option>
-            {/* <option value="fashion">Fashion</option> */}
-            {/* <option value="sports">Sports</option> */}
+
             <option value="education">Education</option>
           </Select>
         </div>
@@ -152,6 +178,7 @@ const CreatePost = () => {
         )}
         <ReactQuill
           theme="snow"
+          value={formData.content}
           placeholder="Write something amazing..."
           className="h-52 mb-12"
           required
@@ -160,7 +187,7 @@ const CreatePost = () => {
           }}
         />
         <Button type="submit" outline gradientDuoTone="purpleToPink" size="lg">
-          Publish Your Post
+          Update Your Post
         </Button>
         {publishError && (
           <Alert className="mt-5" color="failure">
@@ -172,4 +199,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default UpdatePost;
