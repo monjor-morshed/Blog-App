@@ -53,7 +53,7 @@ export const update = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  if (req.user.id !== req.params.id) {
+  if (!req.user.isAdmin && req.user.id !== req.params.id) {
     return next(errorHandler(403, "You are not authorized"));
   }
   try {
@@ -70,6 +70,46 @@ export const signout = (req, res, next) => {
       .clearCookie("access_token")
       .status(200)
       .json({ message: "Signout successful" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, "You are not authorized to view users"));
+  }
+
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 6;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+    const users = await User.find()
+      .skip(startIndex)
+      .limit(limit)
+      .sort({ createdAt: sortDirection });
+
+    const userWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+      return rest;
+    });
+
+    const count = await User.countDocuments();
+
+    const now = new Date();
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    const lastMonthUsers = await User.find({
+      createdAt: { $gte: oneMonthAgo },
+    });
+    res.status(200).json({
+      users: userWithoutPassword,
+      count,
+      lastMonthUsers: lastMonthUsers,
+    });
   } catch (error) {
     return next(error);
   }
